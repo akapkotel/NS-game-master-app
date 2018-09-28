@@ -1,3 +1,16 @@
+"""
+This application is a tkinter windowed-app for Neuroshima game-masters. It
+provides a repository for player-sharacters and NPC statsheets with all skills
+and statistics and easy-to-use dice-testing functionality which could be used
+straight from the character-statsheet.
+
+Character statistics are stored in the python dict, and displayed in tkinter
+window.
+
+Another functionality is a repository of game-locations with a short text-de-
+scriptions and links to the google-maps geolocations. One click opens a new tab
+in the default browser with the g-maps address.
+"""
 import shelve
 from functools import partial
 import webbrowser
