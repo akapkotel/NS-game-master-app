@@ -64,6 +64,7 @@ class Trick:
         self.modifier = modifier
 
 class Person:
+    """Class for a player-character or an NPC character-sheet."""
 
     def __init__(self, name: str):
         self.name = name
@@ -98,6 +99,7 @@ class Person:
 
 
 class Location():
+    """Class for an geo-locations links for in-game places."""
 
     def __init__(self, name: str, address: str, description: str=None):
         self.name = name
@@ -106,6 +108,7 @@ class Location():
 
 
 class Application:
+    """Actual tkinter window-app."""
 
     def __init__(self, master):
         self.mainframe = master
