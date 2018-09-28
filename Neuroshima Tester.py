@@ -1,9 +1,9 @@
 import shelve
+from functools import partial
 import webbrowser
 from random import *
 from tkinter import *
 from tkinter import filedialog
-from functools import partial
 
 
 class Statistic:
@@ -16,6 +16,13 @@ class Statistic:
                   "Szczęście"]
 
     def __init__(self, name: str, value: int):
+        """
+        Creates a new Statistic of NS-rpg mechanics. Possible Statistics are:
+        Budowa, Zręczność, Percepcja, Spryt, Charakter, Szczęście.
+
+        :param name: str name of a Statistic
+        :param value: int value of a Statistic (in range: 8-20)
+        """
         self.name = name
         self.type = "Statistic"
         self.value = value
@@ -43,6 +50,14 @@ class Skill:
                   "Morale": "Charakter"}
 
     def __init__(self, name: str, value: int, sliders: int=0, statistic=None):
+        """
+        Creates a newe Skill of NS-rpg mechanics.
+
+        :param name: str name of a Skill
+        :param value: value of a Skill (in range: 1-8)
+        :param sliders: amount of sliders gained (each makes tests 1-level easier)
+        :param statistic: a Statistic which is tested along with this Skill
+        """
         self.name = name
         self.type = "Skill"
         self.value = value
@@ -56,6 +71,16 @@ class Trick:
     def __init__(self, name: str, description: str, statistic: str=None,
                  slider: int=0, repeat: bool=False,
                  modifier: int=0):
+        """
+        Creates a new NS-rpg mechanics special trait.
+
+        :param name: str name of a trick.trait.
+        :param description: str description od trait.
+        :param statistic: str, which Skill/Statistic it concerns.
+        :param slider: bool, if trck provides additional sliders in tests.
+        :param repeat: bool, if trait provides a re-roll of an tests.
+        :param modifier: int, if trait provides a test-modifier.
+        """
         self.name = name
         self.statistic = statistic
         self.description = description
@@ -63,10 +88,16 @@ class Trick:
         self.repeat = repeat
         self.modifier = modifier
 
+
 class Person:
     """Class for a player-character or an NPC character-sheet."""
 
     def __init__(self, name: str):
+        """
+        Creates a new player-character or NPC.
+
+        :param name: str, name of the character.
+        """
         self.name = name
         self.statistics = {}
         self.tricks = {}
@@ -101,7 +132,14 @@ class Person:
 class Location():
     """Class for an geo-locations links for in-game places."""
 
-    def __init__(self, name: str, address: str, description: str=None):
+    def __init__(self, name: str, address: str, description: str = None):
+        """
+        Creates a new g-maps location.
+
+        :param name: str, name of the place.
+        :param address: str, http address to the g-maps geo-location of place.
+        :param description: str, description of the place.
+        """
         self.name = name
         self.address = address
         self.description = description
@@ -155,7 +193,12 @@ class Application:
         print(file)
 
     def show_elements(self, dictOfElements: dict):
-        """Display in the window all elements of a dictionary."""
+        """
+        Display in the window all elements of a dictionary.
+
+        :param dictOfElements: dict, dicitionary of elements.
+        :return: None
+        """
         self.clear(self.display_frame, self.test_frame)
         for element in dictOfElements:
             self.display_new_element(dictOfElements[element])
@@ -173,7 +216,12 @@ class Application:
         self.message_label.configure(text="")
 
     def display_new_element(self, element):
-        """Display one element of an dict."""
+        """
+        Display one element of an dict.
+
+        :param element: element of an dicitionary.
+        :return: None
+        """
         if len(self.display_frame.winfo_children()) == 0 or \
             len(self.display_frame.winfo_children()[-1].winfo_children()) > 15:
             self.new_row(self.display_frame)
@@ -184,19 +232,35 @@ class Application:
             self.display_new_location(element)
 
     def clear(self, *cleared):
-        """Clear the window preparing it to display new content."""
+        """
+        Clear the window of it's children-widgets preparing it to display new
+        content.
+
+        :param cleared: a tkinter widget to be cleared of it's children
+        :return: None
+        """
         self.message_label.configure(text="", bg="white")
         for widget in cleared:
             for child in widget.winfo_children():
                 child.destroy()
 
     def new_row(self, where):
-        """Add a new row to the displayed Character list."""
+        """
+        Add a new row to the displayed Character list.
+
+        :param where: a widget inside which a new child will be created
+        :return: None
+        """
         new_row = Frame(where)
         new_row.pack(side=LEFT, expand=YES, fill=BOTH)
 
-    def display_new_person(self, person):
-        """Add one Character to the window."""
+    def display_new_person(self, person: Person):
+        """
+        Add one Character to the window.
+
+        :param person: an instance of a Person class.
+        :return: None
+        """
         lf = LabelFrame(self.display_frame.winfo_children()[-1], text=person.name)
         lf.pack()
 
@@ -212,8 +276,13 @@ class Application:
             Label(lf, text="X",
                   fg="red").pack(side=LEFT)
 
-    def display_new_location(self, location):
-        """Add one Location to the window."""
+    def display_new_location(self, location: Location):
+        """
+        Add one Location to the window.
+
+        :param location: an instance of the Location class.
+        :return: None
+        """
         lf = LabelFrame(self.display_frame.winfo_children()[-1],
                         text=location.name)
         lf.pack()
@@ -225,22 +294,33 @@ class Application:
         Button(lf, text="Usuń", bg="red", command=partial(self.delete_element,
                 self.locations, location)).pack(side=LEFT)
 
-    def delete_element(self, dictOfElements, element):
-        """Delete a Character from self.persons dict."""
+    def delete_element(self, dictOfElements: dict, element):
+        """
+        Delete an element from the provided dict
+
+        :param dictOfElements: dict, dicitionary to process.
+        :param element: an instance of spcified class to be deleted.
+        :return: None
+        """
         del dictOfElements[element.name]
         self.show_elements(dictOfElements)
 
-    def find_element(self):
-        """Find a particular element in a proper dict."""
-        name = self.search_entry.get()
-        pass
-
     def show_on_map(self, addres: str):
-        """Open webbrowser with a new tab and displays a location on gmaps."""
+        """
+        Open webbrowser with a new tab and displays a location on gmaps.
+
+        :param addres: str, a http address of the geolocation in gmaps.
+        :return: None
+        """
         webbrowser.open(addres, autoraise=True)
 
     def find_person(self):
-        """Find a particular Person in self.persons dict."""
+        """
+        Find a particular Person in self.persons dict. The instance is querried
+        from an entry in the main window.
+
+        :return: None
+        """
         name = self.search_entry.get()
         if name is None:
             if name in self.persons.keys():
@@ -250,11 +330,21 @@ class Application:
             self.message_label.configure(text="Nie znaleziono.", bg="red")
 
     def bind_keys(self, event):
-        """Bind keyboard-press to the self.autocompletion method."""
+        """
+        Bind keyboard-press to the self.autocompletion method.
+
+        :param event: key-press in entry field.
+        :return: None
+        """
         self.search_entry.bind("<Key>", self.autocomplete)
 
     def autocomplete(self, event):
-        """Change an user-input from search field to the searching result."""
+        """
+        Change an user-input from search field to the searching result.
+
+        :param event: key-press in the entry-field.
+        :return: None
+        """
         self.clear(self.display_frame)
         entry_input = self.search_entry.get()
 
@@ -268,8 +358,13 @@ class Application:
                 if entry_input in self.locations[location].name:
                     self.display_new_element(self.locations[location])
 
-    def show_statistics(self, person):
-        """Display all the stats of a particular character."""
+    def show_statistics(self, person: Person):
+        """
+        Display all the stats of a particular character.
+
+        :param person: an instance of Person class.
+        :return: None
+        """
         self.clear(self.display_frame)
         Frame(self.display_frame).pack(side=TOP)
         Label(self.display_frame.winfo_children()[-1], text=person.name).pack()
@@ -288,8 +383,14 @@ class Application:
         if not check_required(person):
             self.message_label.configure(text="Ustaw wartości Współczynników głównych!", bg="red")
 
-    def display_statistic(self, person, statistic):
-        """Display a one Statistic at the end of current-frame."""
+    def display_statistic(self, person: Person, statistic: Statistic):
+        """
+        Display a one Statistic at the end of current-frame.
+
+        :param person: an instance of the Person class.
+        :param statistic: an instance of the Statistic class.
+        :return: None
+        """
         if len(self.display_frame.winfo_children()) == 1 or \
                 len(self.display_frame.winfo_children()[
                         -1].winfo_children()) > 20:
@@ -332,8 +433,13 @@ class Application:
                                                           expand=YES,
                                                           fill=X)
 
-    def show_tricks(self, person):
-        """Display all Tricks and Traits of a person."""
+    def show_tricks(self, person: Person):
+        """
+        Display all Tricks and Traits of a person.
+
+        :param person: an instance of the Person class
+        :return: None
+        """
         self.clear(self.display_frame)
 
         Label(self.display_frame, text="Sztuczki i Cechy:").pack(side=TOP)
@@ -346,7 +452,13 @@ class Application:
                command=partial(self.add_trick, person)).pack(side=TOP, fill=X)
 
     def display_trick(self, person, trick):
-        """Add one Trick or Trait from person.trick dict to the window."""
+        """
+        Add one Trick or Trait from person.trick dict to the window.
+
+        :param person: an instance of the Person class.
+        :param trick: an instanmce of the Trick class.
+        :return: None
+        """
 
         if len(self.display_frame.winfo_children()) == 1 or \
                 len(self.display_frame.winfo_children()[
@@ -386,8 +498,14 @@ class Application:
                   3: 8, 4: 11, 5: 15, 6: 20, 7: 24}
         return values[slider_value]
 
-    def run_test(self, person, statistic):
-        """Simulate a 3d20 test of a particular Skill or Statistic."""
+    def run_test(self, person: Person, statistic: Statistic or Skill):
+        """
+        Simulate a 3d20 test of a particular Skill or Statistic.
+
+        :param person: an instance of the Person class.
+        :param statistic: an instance of the Statistic or Skill class.
+        :return: None
+        """
 
         def difficulty_text(event):
             names = {-2: "Bardzo łatwy", -1: "Łatwy", 0: "Przeciętny",
@@ -545,7 +663,7 @@ class Application:
         modifier = 0
         apply_tricks()
 
-        if statistic.type == "Skill":
+        if isinstance(statistic, Skill):
             Button(self.display_frame, text="Rzuć!",
                    command=partial(roll_for_skill, statistic)).pack(side=TOP)
         else:
@@ -555,10 +673,14 @@ class Application:
         Button(self.display_frame, text="Powrót", command=partial(
             self.show_statistics, person)).pack(side=TOP)
 
-    def add_new_skill(self, person, skill_name):
+    def add_new_skill(self, person: Person, skill_name: str):
         """
         Register new Skill to the Person's dict and display new list of this
         Character's skills.
+
+        :param person: an instance of the Person class.
+        :param skill_name: str, name of the skill.
+        :return: None
         """
 
         def add_skill(person):
@@ -602,10 +724,14 @@ class Application:
         Button(self.display_frame, text="Dodaj Umiejętność!",
                command=partial(add_skill, person)).pack(side=TOP)
 
-    def add_new_statistic(self, person, stat_name=None):
+    def add_new_statistic(self, person: Person, stat_name=None):
         """
         Register new Statistic to the Person's dict and display new list of
         this Character's skills.
+
+        :param person: an instance of the Person class.
+        :param stat_name: str, name of statistic.
+        :return: None
         """
 
         def add_statistic(person):
@@ -638,8 +764,14 @@ class Application:
         Button(self.display_frame, text="Dodaj Cechę!",
                command=partial(add_statistic, person)).pack(side=TOP)
 
-    def add_trick(self, person, trick_name=None):
-        """Add a new special-trait/trick to the person."""
+    def add_trick(self, person: Person, trick_name=None):
+        """
+        Add a new special-trait/trick to the person.
+
+        :param person: person: an instance of the Person class.
+        :param trick_name: str, special trait name.
+        :return: None
+        """
         def new_trick(person):
             trick_name = self.name_entry.get()
             description = self.work_entry.get()
@@ -697,7 +829,11 @@ class Application:
                command=partial(new_trick, person)).pack(side=TOP)
 
     def create_person(self):
-        """Display form for adding new Characters to self.persons dict."""
+        """
+        Display form for adding new Characters to self.persons dict.
+
+        :return: None
+        """
         self.clear(self.display_frame)
 
         lf = LabelFrame(self.display_frame, text="Imię:")
@@ -712,6 +848,8 @@ class Application:
         """
         Add a new Character to the character's dict. It is only a raw data
         which is later used to display records in the window.
+
+        :return: None
         """
         name = self.name_entry.get()
         if name != "":
@@ -727,8 +865,13 @@ class Application:
         else:
             self.message_label.configure(text="Wpisz imię!", bg="red")
 
-    def create_location(self, location=None):
-        """Fulfill data fields for a new Location to be added."""
+    def create_location(self, location: Location=None):
+        """
+        Fulfill data fields for a new Location to be added.
+
+        :param location: an instance of the Location class.
+        :return: None
+        """
         self.clear(self.display_frame)
 
         lfn = LabelFrame(self.display_frame, text="Nazwa:")
@@ -756,7 +899,11 @@ class Application:
         Button(self.display_frame, text="Zapisz!", command=self.new_location).pack(side=TOP)
 
     def new_location(self):
-        """Add a new Location to the self.locations dict."""
+        """
+        Add a new Location to the self.locations dict.
+
+        :return: None
+        """
         name = self.name_entry.get()
         address = self.address_entry.get()
         desc = self.desc_entry.get()
@@ -767,6 +914,8 @@ class Application:
         """
         Saves self.persons dict to the file. Called automatically when the
         application is closed.
+
+        :return: None
         """
         shelfFile = shelve.open("saved_data")
         shelfFile['persons'] = self.persons
@@ -777,6 +926,8 @@ class Application:
         """
         Retrieve a self.persons dict from the file. Called automatically on
         the start of application.
+
+        :return: None
         """
         shelfFile = shelve.open("saved_data")
         self.persons = shelfFile['data']
@@ -787,13 +938,22 @@ class Application:
                  str(len(self.locations)-1) + " locations loaded successfully.")
 
     def close_application(self):
-        """Replace a default application closing mechanism."""
+        """
+        Replace a default application closing mechanism.
+
+        :return: None
+        """
         self.save()
         self.mainframe.destroy()
 
 
-def check_required(person):
-    """Check if a Person has all required Statistics. Returns boolean."""
+def check_required(person: Person):
+    """
+    Check if a Person has all required Statistics. Returns boolean.
+
+    :param person: an instance of the Person class.
+    :return: bool, if there is enough Statistics created.
+    """
     stats_count = 0
     for stat in person.statistics:
         if isinstance(person.statistics[stat], Statistic):
@@ -806,3 +966,4 @@ if __name__ == '__main__':
     root = Tk()
     app = Application(root)
     root.mainloop()
+    
