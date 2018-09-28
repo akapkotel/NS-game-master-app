@@ -1,9 +1,9 @@
 import shelve
-from functools import partial
 import webbrowser
 from random import *
 from tkinter import *
 from tkinter import filedialog
+from functools import partial
 
 
 class Statistic:
@@ -152,7 +152,7 @@ class Application:
         print(file)
 
     def show_elements(self, dictOfElements: dict):
-        """Displays in the window all elements of a dictionary."""
+        """Display in the window all elements of a dictionary."""
         self.clear(self.display_frame, self.test_frame)
         for element in dictOfElements:
             self.display_new_element(dictOfElements[element])
@@ -170,7 +170,7 @@ class Application:
         self.message_label.configure(text="")
 
     def display_new_element(self, element):
-        """Displays one element of an dict."""
+        """Display one element of an dict."""
         if len(self.display_frame.winfo_children()) == 0 or \
             len(self.display_frame.winfo_children()[-1].winfo_children()) > 15:
             self.new_row(self.display_frame)
@@ -181,7 +181,7 @@ class Application:
             self.display_new_location(element)
 
     def clear(self, *cleared):
-        """Clears the window preparing it to display new content."""
+        """Clear the window preparing it to display new content."""
         self.message_label.configure(text="", bg="white")
         for widget in cleared:
             for child in widget.winfo_children():
@@ -228,12 +228,12 @@ class Application:
         self.show_elements(dictOfElements)
 
     def find_element(self):
-        """Finds a particular element in a proper dict."""
+        """Find a particular element in a proper dict."""
         name = self.search_entry.get()
         pass
 
     def show_on_map(self, addres: str):
-        """Opens webbrowser with a new tab and displays a location on gmaps."""
+        """Open webbrowser with a new tab and displays a location on gmaps."""
         webbrowser.open(addres, autoraise=True)
 
     def find_person(self):
@@ -247,11 +247,11 @@ class Application:
             self.message_label.configure(text="Nie znaleziono.", bg="red")
 
     def bind_keys(self, event):
-        """Binds keyboard-press to the self.autocompletion method."""
+        """Bind keyboard-press to the self.autocompletion method."""
         self.search_entry.bind("<Key>", self.autocomplete)
 
     def autocomplete(self, event):
-        """Changes an user-input from search field to the searching result."""
+        """Change an user-input from search field to the searching result."""
         self.clear(self.display_frame)
         entry_input = self.search_entry.get()
 
@@ -286,7 +286,7 @@ class Application:
             self.message_label.configure(text="Ustaw wartości Współczynników głównych!", bg="red")
 
     def display_statistic(self, person, statistic):
-        """"""
+        """Display a one Statistic at the end of current-frame."""
         if len(self.display_frame.winfo_children()) == 1 or \
                 len(self.display_frame.winfo_children()[
                         -1].winfo_children()) > 20:
@@ -330,7 +330,7 @@ class Application:
                                                           fill=X)
 
     def show_tricks(self, person):
-        """Displays all Tricks and Traits of a person."""
+        """Display all Tricks and Traits of a person."""
         self.clear(self.display_frame)
 
         Label(self.display_frame, text="Sztuczki i Cechy:").pack(side=TOP)
@@ -343,7 +343,7 @@ class Application:
                command=partial(self.add_trick, person)).pack(side=TOP, fill=X)
 
     def display_trick(self, person, trick):
-        """Adds one Trick or Trait from person.trick dict to the window."""
+        """Add one Trick or Trait from person.trick dict to the window."""
 
         if len(self.display_frame.winfo_children()) == 1 or \
                 len(self.display_frame.winfo_children()[
@@ -364,27 +364,27 @@ class Application:
         b.pack(side=LEFT, expand=YES, fill=X)
 
     def delete_stat(self, person, statistic):
-        """Deletes a Skill of Statistic from person's statistics dict."""
+        """Delete a Skill of Statistic from person's statistics dict."""
         del person.statistics[statistic]
         self.show_statistics(person)
 
     def delete_trick(self, person, trick):
-        """Deletes a Trick or Trait from person's tricks dict."""
+        """Delete a Trick or Trait from person's tricks dict."""
         del person.tricks[trick]
         self.show_tricks(person)
 
     def dice_roll(cls, faces: int):
-        """Generates result in range of 1–[number of faces] and returns it."""
+        """Generate result in range of 1–[number of faces] and returns it."""
         return randint(1, faces)
 
     def convert_sliders(self, slider_value: int):
-        """Converts sliders/test difficulty to the actual modifier."""
+        """Convert sliders/test difficulty to the actual modifier."""
         values = {-5: -15, -4: -11, -3: -8, -2: -5, -1: -2, 0: 0, 1: 2, 2: 5,
                   3: 8, 4: 11, 5: 15, 6: 20, 7: 24}
         return values[slider_value]
 
     def run_test(self, person, statistic):
-        """Simulates a 3d20 test of a particular Skill or Statistic."""
+        """Simulate a 3d20 test of a particular Skill or Statistic."""
 
         def difficulty_text(event):
             names = {-2: "Bardzo łatwy", -1: "Łatwy", 0: "Przeciętny",
@@ -553,8 +553,10 @@ class Application:
             self.show_statistics, person)).pack(side=TOP)
 
     def add_new_skill(self, person, skill_name):
-        """Registers new Skill to the Person's dict and displays
-        new list of this Character's skills."""
+        """
+        Register new Skill to the Person's dict and display new list of this
+        Character's skills.
+        """
 
         def add_skill(person):
             name = skill_name if skill_name is not None else self.entry.get()
@@ -598,8 +600,10 @@ class Application:
                command=partial(add_skill, person)).pack(side=TOP)
 
     def add_new_statistic(self, person, stat_name=None):
-        """Registers new Statistic to the Person's dict and displays
-                new list of this Character's skills."""
+        """
+        Register new Statistic to the Person's dict and display new list of
+        this Character's skills.
+        """
 
         def add_statistic(person):
             name = stat_name if stat_name is not None else self.entry.get()
@@ -632,7 +636,7 @@ class Application:
                command=partial(add_statistic, person)).pack(side=TOP)
 
     def add_trick(self, person, trick_name=None):
-        """"""
+        """Add a new special-trait/trick to the person."""
         def new_trick(person):
             trick_name = self.name_entry.get()
             description = self.work_entry.get()
@@ -690,7 +694,7 @@ class Application:
                command=partial(new_trick, person)).pack(side=TOP)
 
     def create_person(self):
-        """Displays form for adding new Characters to self.persons dict."""
+        """Display form for adding new Characters to self.persons dict."""
         self.clear(self.display_frame)
 
         lf = LabelFrame(self.display_frame, text="Imię:")
@@ -703,7 +707,7 @@ class Application:
 
     def new_person(self):
         """
-        Adds a new Character to the character's dict. It is only a raw data
+        Add a new Character to the character's dict. It is only a raw data
         which is later used to display records in the window.
         """
         name = self.name_entry.get()
@@ -721,7 +725,7 @@ class Application:
             self.message_label.configure(text="Wpisz imię!", bg="red")
 
     def create_location(self, location=None):
-        """"""
+        """Fulfill data fields for a new Location to be added."""
         self.clear(self.display_frame)
 
         lfn = LabelFrame(self.display_frame, text="Nazwa:")
@@ -749,7 +753,7 @@ class Application:
         Button(self.display_frame, text="Zapisz!", command=self.new_location).pack(side=TOP)
 
     def new_location(self):
-        """"""
+        """Add a new Location to the self.locations dict."""
         name = self.name_entry.get()
         address = self.address_entry.get()
         desc = self.desc_entry.get()
@@ -757,16 +761,20 @@ class Application:
         self.locations[name] = Location(name, address, desc)
 
     def save(self):
-        """Saves self.persons dict to the file. Called automatically when the
-        application is closed."""
+        """
+        Saves self.persons dict to the file. Called automatically when the
+        application is closed.
+        """
         shelfFile = shelve.open("saved_data")
         shelfFile['persons'] = self.persons
         shelfFile['locations'] = self.locations
         shelfFile.close()
 
     def load(self):
-        """Retrieves a self.persons dict from the file. Called automatically on
-        the start of application."""
+        """
+        Retrieve a self.persons dict from the file. Called automatically on
+        the start of application.
+        """
         shelfFile = shelve.open("saved_data")
         self.persons = shelfFile['data']
         self.locations = shelfFile['locations']
@@ -776,7 +784,7 @@ class Application:
                  str(len(self.locations)-1) + " locations loaded successfully.")
 
     def close_application(self):
-        """Replaces a default application closing mechanism."""
+        """Replace a default application closing mechanism."""
         self.save()
         self.mainframe.destroy()
 
