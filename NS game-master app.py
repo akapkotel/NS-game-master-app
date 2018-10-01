@@ -11,6 +11,7 @@ Another functionality is a repository of game-locations with a short text-de-
 scriptions and links to the google-maps geolocations. One click opens a new tab
 in the default browser with the g-maps address.
 """
+
 import shelve
 from functools import partial
 import webbrowser
@@ -703,7 +704,7 @@ class Application:
             if self.entry3.get() != "":
                 statistic = person.statistics[self.entry3.get()].value
             else:
-                statistic = person.statistics[Skill.Statistics[name]].value
+                statistic = person.statistics[Skill.Statistics[name.title()]].value
 
             person.statistics[name] = Skill(name, value, sliders, statistic)
 
@@ -943,7 +944,7 @@ class Application:
         :return: None
         """
         shelfFile = shelve.open("saved_data")
-        self.persons = shelfFile['data']
+        self.persons = shelfFile['persons']
         self.locations = shelfFile['locations']
         shelfFile.close()
         self.message_label.configure(
@@ -979,4 +980,3 @@ if __name__ == '__main__':
     root = Tk()
     app = Application(root)
     root.mainloop()
-    
