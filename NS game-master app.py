@@ -37,8 +37,8 @@ class Statistic:
         :param name: str name of a Statistic
         :param value: int value of a Statistic (in range: 8-20)
         """
-        self.name = name
         self.type = "Statistic"
+        self.name = name
         self.value = value
 
 
@@ -61,7 +61,9 @@ class Skill:
                   "Motocykl": "Zręczność", "Mechanika": "Spryt",
                   "Elektronika": "Spryt", "Komputery": "Spryt",
                   "Dowodzenie": "Charakter", "Niezłomność": "Charakter",
-                  "Morale": "Charakter"}
+                  "Morale": "Charakter", "Zastraszanie": "Charakter",
+                  "Pierwsza pomoc": "Spryt", "Wiedza medyczna": "Spryt",
+                  "Chirurgia": "Zręczność"}
 
     def __init__(self, name: str, value: int, sliders: int=0, statistic=None):
         """
@@ -72,8 +74,8 @@ class Skill:
         :param sliders: amount of sliders gained (each makes tests 1-level easier)
         :param statistic: a Statistic which is tested along with this Skill
         """
-        self.name = name
         self.type = "Skill"
+        self.name = name
         self.value = value
         self.sliders = sliders
         self.statistic = statistic
@@ -493,21 +495,43 @@ class Application:
         b.pack(side=LEFT, expand=YES, fill=X)
 
     def delete_stat(self, person, statistic):
-        """Delete a Skill of Statistic from person's statistics dict."""
+        """
+        Delete a Skill of Statistic from person's statistics dict.
+
+        :param person: an instance of the Person class.
+        :param statistic: an instanmce of the Statistic class.
+        :return: None
+        """
         del person.statistics[statistic]
         self.show_statistics(person)
 
     def delete_trick(self, person, trick):
-        """Delete a Trick or Trait from person's tricks dict."""
+        """
+        Delete a Trick or Trait from person's tricks dict.
+
+        :param person: an instance of the Person class.
+        :param trick: an instance of the Trick class.
+        :return: None
+        """
         del person.tricks[trick]
         self.show_tricks(person)
 
     def dice_roll(cls, faces: int):
-        """Generate result in range of 1–[number of faces] and returns it."""
+        """
+        Generate result in range of 1–[number of faces] and returns it.
+
+        :param faces: int, number of dice-faces.
+        :return: int, result of the dice-roll.
+        """
         return randint(1, faces)
 
     def convert_sliders(self, slider_value: int):
-        """Convert sliders/test difficulty to the actual modifier."""
+        """
+        Convert sliders/test difficulty to the actual modifier.
+
+        :param slider_value: int, number of sliders.
+        :return: int, modifier to the test.
+        """
         values = {-5: -15, -4: -11, -3: -8, -2: -5, -1: -2, 0: 0, 1: 2, 2: 5,
                   3: 8, 4: 11, 5: 15, 6: 20, 7: 24}
         return values[slider_value]
@@ -585,43 +609,43 @@ class Application:
 
         def roll_for_skill(statistic):
 
-            skillPoints = statistic.value
-            sliders = (slider + int(skillPoints / 4))
+            skill_points = statistic.value
+            sliders = (slider + int(skill_points / 4))
 
             base_difficulty = int(self.diff_scale.get()) - sliders
             real_difficulty = self.convert_sliders(base_difficulty)
 
-            rollResult = []
+            roll_result = []
 
             for i in range(0, 3):
-                rollResult.append(self.dice_roll(20))
-            original_roll_result = rollResult.copy()
+                roll_result.append(self.dice_roll(20))
+            original_roll_result = roll_result.copy()
 
-            for result in rollResult:
+            for result in roll_result:
                 if result == 1:
                     real_difficulty -= 3
                 elif result == 20:
                     real_difficulty += 3
             testedValue = statistic.statistic - real_difficulty
 
-            worstResult = max(rollResult)
-            rollResult.remove(worstResult)
-            unmodified = rollResult.copy()
+            worst_result = max(roll_result)
+            roll_result.remove(worst_result)
+            unmodified = roll_result.copy()
 
-            while skillPoints > 0:
-                skillPoints -= 1
+            while skill_points > 0:
+                skill_points -= 1
                 for i in range(0, 2):
-                    if rollResult[i] == max(rollResult) and rollResult[i] > 1:
-                        rollResult[i] -= 1
+                    if roll_result[i] == max(roll_result) and roll_result[i] > 1:
+                        roll_result[i] -= 1
                         break
 
-            if max(rollResult) > testedValue:
-                fail_points = max(rollResult) - testedValue
-                display_result([False, original_roll_result, rollResult,
+            if max(roll_result) > testedValue:
+                fail_points = max(roll_result) - testedValue
+                display_result([False, original_roll_result, roll_result,
                                 fail_points, testedValue, unmodified])
             else:
-                succes_points = abs(max(rollResult) - testedValue)
-                display_result([True, original_roll_result, rollResult,
+                succes_points = abs(max(roll_result) - testedValue)
+                display_result([True, original_roll_result, roll_result,
                                 succes_points, testedValue, unmodified])
 
         def roll_for_stat(statistic):
@@ -641,8 +665,8 @@ class Application:
                     real_difficulty += 3
             tested_value = statistic.value - real_difficulty
 
-            worstResult = max(roll_result)
-            roll_result.remove(worstResult)
+            worst_result = max(roll_result)
+            roll_result.remove(worst_result)
 
             for result in roll_result:
                 if result > tested_value:
@@ -791,11 +815,12 @@ class Application:
             description = self.work_entry.get()
             stat_name = self.stat_entry.get()
             slider = self.scale.get()
+            modifier = self.mod_entry.get()
             repeat = self.reroll_box.getboolean(repeat_roll)
             mod = 0
             person.tricks[trick_name] = Trick(trick_name, description,
                                               stat_name, slider, repeat,
-                                              mod)
+                                              modifier)
             self.show_statistics(person)
 
         name = "" if trick_name is None else person.tricks[trick_name].name
@@ -817,6 +842,13 @@ class Application:
         self.stat_entry = Entry(self.display_frame.winfo_children()[-1])
         self.stat_entry.insert(END, stat)
         self.stat_entry.pack(side=LEFT)
+
+        LabelFrame(self.display_frame, text="Ułatwia test?:")
+        self.display_frame.winfo_children()[-1].pack()
+        self.mod_entry = Entry(self.display_frame.winfo_children()[-1],
+                                      variable=repeat_roll)
+        self.mod_entry.insert(END, modifier)
+        self.reroll_box.pack(side=LEFT)
 
         LabelFrame(self.display_frame, text="Zapewnia przerzut?:")
         self.display_frame.winfo_children()[-1].pack()
